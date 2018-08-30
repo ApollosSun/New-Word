@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#AB47BC</color>
+    <color name="colorPrimaryDark">#7B1FA2</color>
+    <color name="colorAccent">#BA68C8</color>
+    <color name="msg_no_notes">#999</color>
+    <color name="hint_enter_note">#c2c2c2</color>
+    <color name="comment">#858585</color>
+    <color name="word">#606060</color>
+</resources>

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">NewWord</string>
+    <string name="app_title">New Word</string>
+    <string name="type_a_word">Type a word</string>
+    <string name="type_a_translation">Type a translation</string>
+    <string name="type_a_comment">Type a comment</string>
 </resources>

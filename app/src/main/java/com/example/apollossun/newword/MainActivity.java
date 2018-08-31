@@ -1,6 +1,7 @@
 package com.example.apollossun.newword;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.CoordinatorLayout;
@@ -29,11 +30,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_ACCESS_CREATE = 1;
+    private static final int REQUEST_ACCESS_UPDATE = 2;
+
     private WordsAdapter mWordsAdapter;
     private List<Word> wordList = new ArrayList<>();
     private TextView tvNoWords;
     private DbHelper db;
 
+    private int mPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +60,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                showWordDialog(false, null, -1);
+//                showWordDialog(false, null, -1);
+                Intent intent = new Intent(MainActivity.this, CreateWordActivity.class);
+                startActivityForResult(intent, REQUEST_ACCESS_CREATE);
             }
         });
 
@@ -84,6 +91,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
+     * Receiving word from CreateWordActivity
+     * and inserting a new or updating an existing word
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+
+        if(resultCode == RESULT_OK){
+
+            String word = data.getStringExtra(CreateWordActivity.WORD_KEY);
+            String translation = data.getStringExtra(CreateWordActivity.TRANSLATION_KEY);
+            String comment = data.getStringExtra(CreateWordActivity.COMMENT_KEY);
+
+            if(requestCode==REQUEST_ACCESS_CREATE) {
+                createWord(word, translation, comment);
+            } else if(requestCode==REQUEST_ACCESS_UPDATE){
+                updateWord(word, translation, comment, mPosition);
+            }else{
+                super.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+    }
+
+    /*
      * Inserting new word in db
      * and refreshing the list
      */
@@ -101,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
 
             toggleEmptyWords();
         }
-
     }
 
     /*
@@ -150,85 +179,26 @@ public class MainActivity extends AppCompatActivity {
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(which == 0){
-                    showWordDialog(true, wordList.get(position), position);
-                } else {
-                    deleteWord(position);
-                }
+            if(which == 0){
+//                    showWordDialog(true, wordList.get(position), position);
+                mPosition = position;
+                updateWordIntent(wordList.get(position));
+            } else {
+                deleteWord(position);
+            }
             }
         });
         builder.show();
     }
 
-    /*
-     * Shows dialog with Edit options to
-     * create/edit a word.
-     * When shouldUpdate==true, it automatically displays old word
-     * and changes the button text to Update
-     */
-    private void showWordDialog(final boolean shouldUpdate, final Word w, final int position){
-        //TODO try to use this instead of getAppContext
-        LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
-        View view = layoutInflater.inflate(R.layout.word_dialog, null);
-
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-        alertDialogBuilder.setView(view);
-
-        final EditText inputWord = view.findViewById(R.id.et_word);
-        final EditText inputTranslation = view.findViewById(R.id.et_translation);
-        final EditText inputComment = view.findViewById(R.id.et_comment);
-
-        TextView dialogTitle = view.findViewById(R.id.tv_word);
-        dialogTitle.setText(shouldUpdate ? "Edit word" : "New word");
-
-        if(shouldUpdate && w != null){
-            inputWord.setText(w.getWord());
-            inputTranslation.setText(w.getTranslation());
-            inputComment.setText(w.getComment());
-        }
-
-        alertDialogBuilder
-                .setCancelable(false)
-                .setPositiveButton(shouldUpdate ? "update" : "save", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        final AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Show toast when no text is entered
-                if(TextUtils.isEmpty(inputWord.getText().toString())){
-                    Toast.makeText(MainActivity.this, "Type a word",
-                            Toast.LENGTH_SHORT).show();
-                    return;
-                } else {
-                    alertDialog.dismiss();
-                }
-
-                String word = inputWord.getText().toString();
-                String translation = inputTranslation.getText().toString();
-                String comment = inputComment.getText().toString();
-
-                if(shouldUpdate && word.length() > 0){
-                    updateWord(word, translation, comment, position);
-                } else {
-                    createWord(word, translation, comment);
-                }
-            }
-        });
+    private void updateWordIntent(final Word w){
+        Intent intent = new Intent(MainActivity.this, CreateWordActivity.class);
+        intent.putExtra(CreateWordActivity.WORD_KEY, w.getWord());
+        intent.putExtra(CreateWordActivity.TRANSLATION_KEY, w.getTranslation());
+        intent.putExtra(CreateWordActivity.COMMENT_KEY, w.getComment());
+        startActivityForResult(intent, REQUEST_ACCESS_UPDATE);
     }
-
+    
     /**
      * Toggling list and empty notes view
      */
@@ -242,5 +212,75 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
 }
+
+
+
+/*
+     * Shows dialog with Edit options to
+     * create/edit a word.
+     * When shouldUpdate==true, it automatically displays old word
+     * and changes the button text to Update
+
+private void showWordDialog(final boolean shouldUpdate, final Word w, final int position){
+    LayoutInflater layoutInflater = LayoutInflater.from(this);
+    View view = layoutInflater.inflate(R.layout.word_dialog, null);
+
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+    alertDialogBuilder.setView(view);
+
+    final EditText inputWord = view.findViewById(R.id.et_word);
+    final EditText inputTranslation = view.findViewById(R.id.et_translation);
+    final EditText inputComment = view.findViewById(R.id.et_comment);
+
+    TextView dialogTitle = view.findViewById(R.id.tv_word);
+    dialogTitle.setText(shouldUpdate ? "Edit word" : "New word");
+
+    if(shouldUpdate && w != null){
+        inputWord.setText(w.getWord());
+        inputTranslation.setText(w.getTranslation());
+        inputComment.setText(w.getComment());
+    }
+
+    alertDialogBuilder
+            .setCancelable(false)
+            .setPositiveButton(shouldUpdate ? "update" : "save", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            dialog.cancel();
+        }
+    });
+
+    final AlertDialog alertDialog = alertDialogBuilder.create();
+    alertDialog.show();
+
+    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //Show toast when no text is entered
+            if(TextUtils.isEmpty(inputWord.getText().toString())){
+                Toast.makeText(MainActivity.this, "Type a word",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                alertDialog.dismiss();
+            }
+
+            String word = inputWord.getText().toString();
+            String translation = inputTranslation.getText().toString();
+            String comment = inputComment.getText().toString();
+
+            if(shouldUpdate && word.length() > 0){
+                updateWord(word, translation, comment, position);
+            } else {
+                createWord(word, translation, comment);
+            }
+        }
+    });
+}
+ */

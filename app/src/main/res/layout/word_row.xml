@@ -33,9 +33,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_word"
-        android:layout_marginStart="2dp"
+        android:paddingLeft="2dp"
         android:layout_toEndOf="@id/iv_dot"
-        android:text="Size him up with"
+        android:text="Size him up"
         android:textColor="@color/comment"
         android:textSize="18sp"
         android:textStyle="italic" />

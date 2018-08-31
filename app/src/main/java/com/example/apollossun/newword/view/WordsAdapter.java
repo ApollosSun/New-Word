@@ -32,8 +32,14 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull WordsAdapter.ViewHolder holder, int position) {
         Word word = wordList.get(position);
-        String wordSrc = word.getWord() + " - " + word.getTranslation();
-        holder.word.setText(wordSrc);
+
+        if(word.getTranslation().length() > 0){
+            String wordSrc = word.getWord() + " - " + word.getTranslation();
+            holder.word.setText(wordSrc);
+        } else {
+            holder.word.setText(word.getWord());
+        }
+
         if(word.getComment().length() > 0){
             holder.comment.setText(word.getComment());
         } else {

@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:fontFamily="sans-serif-light"
-        android:text="There are no words yet"
+        android:text="@string/no_words"
         android:textColor="@color/hint_enter_note"
         android:textSize="22sp" />
 

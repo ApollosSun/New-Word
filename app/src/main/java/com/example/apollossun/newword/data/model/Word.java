@@ -18,6 +18,14 @@ public class Word {
         this.comment = comment;
     }
 
+    public String getRaw (){
+        if(translation.length() > 0){
+            return word + " - " + translation;
+        } else {
+            return word;
+        }
+    }
+
     public void setWord(String word) {
         this.word = word;
     }

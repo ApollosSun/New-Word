@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-//                showWordDialog(false, null, -1);
                 Intent intent = new Intent(MainActivity.this, CreateWordActivity.class);
                 startActivityForResult(intent, REQUEST_ACCESS_CREATE);
             }
@@ -98,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data){
 
         if(resultCode == RESULT_OK){
-
             String word = data.getStringExtra(CreateWordActivity.WORD_KEY);
             String translation = data.getStringExtra(CreateWordActivity.TRANSLATION_KEY);
             String comment = data.getStringExtra(CreateWordActivity.COMMENT_KEY);
@@ -180,7 +178,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
             if(which == 0){
-//                    showWordDialog(true, wordList.get(position), position);
                 mPosition = position;
                 updateWordIntent(wordList.get(position));
             } else {
@@ -198,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(CreateWordActivity.COMMENT_KEY, w.getComment());
         startActivityForResult(intent, REQUEST_ACCESS_UPDATE);
     }
-    
+
     /**
      * Toggling list and empty notes view
      */
@@ -213,8 +210,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
-
-
 
 /*
      * Shows dialog with Edit options to

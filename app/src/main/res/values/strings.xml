@@ -4,4 +4,5 @@
     <string name="type_a_word">Type a word</string>
     <string name="type_a_translation">Type a translation</string>
     <string name="type_a_comment">Type a comment</string>
+    <string name="no_words">There are no words yet</string>
 </resources>

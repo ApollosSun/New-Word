@@ -3,8 +3,9 @@
     <color name="colorPrimary">#AB47BC</color>
     <color name="colorPrimaryDark">#7B1FA2</color>
     <color name="colorAccent">#BA68C8</color>
-    <color name="msg_no_notes">#999</color>
-    <color name="hint_enter_note">#c2c2c2</color>
-    <color name="comment">#858585</color>
+    <color name="gray">#999</color>
+    <color name="light_gray">#c2c2c2</color>
+    <color name="dark_gray">#858585</color>
     <color name="word">#606060</color>
+    <color name="selection_gray">#F3E5F5</color>
 </resources>

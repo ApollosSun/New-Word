@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/word_row_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
@@ -25,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/iv_dot"
         android:textColor="@color/word"
-        android:textSize="20sp" />
+        android:textSize="20sp"/>
 
     <TextView
         android:id="@+id/tv_comment"
@@ -34,8 +35,8 @@
         android:layout_below="@id/tv_word"
         android:paddingStart="2dp"
         android:layout_toEndOf="@id/iv_dot"
-        android:textColor="@color/comment"
+        android:textColor="@color/dark_gray"
         android:textSize="18sp"
-        android:textStyle="italic" />
+        android:textStyle="italic"/>
 
 </RelativeLayout>

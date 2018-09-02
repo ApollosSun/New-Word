@@ -5,4 +5,7 @@
     <string name="type_a_translation">Type a translation</string>
     <string name="type_a_comment">Type a comment</string>
     <string name="no_words">There are no words yet</string>
+    <string name="create_word">Create word</string>
+    <string name="edit_word">Edit word</string>
+    <string name="delete_word">Delete word</string>
 </resources>

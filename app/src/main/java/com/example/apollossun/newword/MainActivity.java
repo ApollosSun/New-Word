@@ -3,21 +3,21 @@ package com.example.apollossun.newword;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.view.LayoutInflater;
+
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.apollossun.newword.data.DbHelper;
 import com.example.apollossun.newword.data.model.Word;
@@ -28,31 +28,33 @@ import com.example.apollossun.newword.view.WordsAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ActionMode.Callback{
 
     private static final int REQUEST_ACCESS_CREATE = 1;
     private static final int REQUEST_ACCESS_UPDATE = 2;
 
     private WordsAdapter mWordsAdapter;
     private List<Word> wordList = new ArrayList<>();
+    private List<Long> selectedIds = new ArrayList<>();
     private TextView tvNoWords;
     private DbHelper db;
+    private ActionMode actionMode;
 
     private int mPosition;
+    private boolean isMultiSelect = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         tvNoWords = findViewById(R.id.tv_empty_list);
 
         db = new DbHelper(this);
-
         wordList.addAll(db.getWords());
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mWordsAdapter = new WordsAdapter(wordList);
+        mWordsAdapter = new WordsAdapter(this, wordList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -79,12 +81,25 @@ public class MainActivity extends AppCompatActivity {
                 recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-
+                if(isMultiSelect){
+                    multiSelect(position);
+                }
             }
 
             @Override
             public void onLongClick(View view, int position) {
-                showActionsDialog(position);
+//                showActionsDialog(position);
+                if(!isMultiSelect){
+                    //TODO check if possible not to create new Array
+                    //selectedIds = new ArrayList<>();
+                    isMultiSelect = true;
+
+                    if(actionMode == null){
+//                        actionMode = startActionMode(MainActivity.this);
+                        actionMode = startSupportActionMode(MainActivity.this);
+                    }
+                }
+                multiSelect(position);
             }
         }));
     }
@@ -201,7 +216,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void toggleEmptyWords() {
         // you can check notesList.size() > 0
-
         if (db.getWordCount() > 0) {
             tvNoWords.setVisibility(View.GONE);
         } else {
@@ -209,73 +223,67 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-}
+    private void multiSelect(int position){
+        Word w = wordList.get(position);
+        long id = w.getId();
+        if(actionMode != null){
 
-/*
-     * Shows dialog with Edit options to
-     * create/edit a word.
-     * When shouldUpdate==true, it automatically displays old word
-     * and changes the button text to Update
+            if(selectedIds.contains(id)){
+                selectedIds.remove(id);
+            } else {
+                selectedIds.add(id);
+            }
 
-private void showWordDialog(final boolean shouldUpdate, final Word w, final int position){
-    LayoutInflater layoutInflater = LayoutInflater.from(this);
-    View view = layoutInflater.inflate(R.layout.word_dialog, null);
+            if(selectedIds.size() > 1){
+                actionMode.getMenu().getItem(0).setVisible(false);
+            } else if(selectedIds.size() == 1) {
+                actionMode.getMenu().getItem(0).setVisible(true);
+            }
 
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-    alertDialogBuilder.setView(view);
+            if(selectedIds.size() > 0){
+                //Show amount of selected items on actionMode
+                actionMode.setTitle(String.valueOf(selectedIds.size()));
+            } else {
+                actionMode.setTitle("");
+                actionMode.finish();
+            }
 
-    final EditText inputWord = view.findViewById(R.id.et_word);
-    final EditText inputTranslation = view.findViewById(R.id.et_translation);
-    final EditText inputComment = view.findViewById(R.id.et_comment);
-
-    TextView dialogTitle = view.findViewById(R.id.tv_word);
-    dialogTitle.setText(shouldUpdate ? "Edit word" : "New word");
-
-    if(shouldUpdate && w != null){
-        inputWord.setText(w.getWord());
-        inputTranslation.setText(w.getTranslation());
-        inputComment.setText(w.getComment());
+            mWordsAdapter.setSelectedIds(selectedIds, position);
+        }
     }
 
-    alertDialogBuilder
-            .setCancelable(false)
-            .setPositiveButton(shouldUpdate ? "update" : "save", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.menu_select, menu);
+        return true;
+    }
 
-                }
-            }).setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            dialog.cancel();
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.edit_action:
+                //todo
+                return true;
+            case R.id.delete_action:
+                //todo
+                return true;
         }
-    });
+        return false;
+    }
 
-    final AlertDialog alertDialog = alertDialogBuilder.create();
-    alertDialog.show();
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        actionMode = null;
+        isMultiSelect = false;
+        selectedIds = new ArrayList<>();
+        mWordsAdapter.setSelectedIds(selectedIds);
+    }
 
-    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            //Show toast when no text is entered
-            if(TextUtils.isEmpty(inputWord.getText().toString())){
-                Toast.makeText(MainActivity.this, "Type a word",
-                        Toast.LENGTH_SHORT).show();
-                return;
-            } else {
-                alertDialog.dismiss();
-            }
-
-            String word = inputWord.getText().toString();
-            String translation = inputTranslation.getText().toString();
-            String comment = inputComment.getText().toString();
-
-            if(shouldUpdate && word.length() > 0){
-                updateWord(word, translation, comment, position);
-            } else {
-                createWord(word, translation, comment);
-            }
-        }
-    });
 }
- */

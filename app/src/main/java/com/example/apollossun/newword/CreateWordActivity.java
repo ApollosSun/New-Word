@@ -49,14 +49,14 @@ public class CreateWordActivity extends AppCompatActivity{
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.create_word_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_create_word, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.create:
+            case R.id.create_action:
                 createWordInstance();
                 return true;
             default:

@@ -2,7 +2,7 @@ package com.example.apollossun.newword.data.model;
 
 public class Word {
 
-    private int id;
+    private long id;
     private String word;
     private String translation;
     private String comment;
@@ -38,7 +38,7 @@ public class Word {
         this.comment = comment;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

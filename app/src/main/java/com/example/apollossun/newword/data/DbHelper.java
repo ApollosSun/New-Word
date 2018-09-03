@@ -5,11 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.apollossun.newword.data.model.Word;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper {
@@ -144,10 +146,14 @@ public class DbHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void deleteWord(Word word){
+    public void deleteWord(List<String> deletingIds){
+        String[] ids = new String[deletingIds.size()];
+        ids = deletingIds.toArray(ids);
+        String idStr = TextUtils.join(",", ids);
+
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(WordContract.TABLE_NAME, WordContract._ID + "=?",
-                new String[]{String.valueOf(word.getId())});
+        db.delete(WordContract.TABLE_NAME, WordContract._ID + " IN (" + idStr + ")",
+                null);
         db.close();
     }
 

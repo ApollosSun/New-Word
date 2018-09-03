@@ -1,10 +1,8 @@
 package com.example.apollossun.newword;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v7.view.ActionMode;
@@ -33,9 +31,14 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     private static final int REQUEST_ACCESS_CREATE = 1;
     private static final int REQUEST_ACCESS_UPDATE = 2;
 
-    private WordsAdapter mWordsAdapter;
+    private WordsAdapter wordsAdapter;
+    private RecyclerView recyclerView;
+
     private List<Word> wordList = new ArrayList<>();
-    private List<Long> selectedIds = new ArrayList<>();
+    private List<String> selectedIds = new ArrayList<>();
+    private List<Integer> selectedPositions = new ArrayList<>();
+    private List<Word> selectedWords = new ArrayList<>();
+
     private TextView tvNoWords;
     private DbHelper db;
     private ActionMode actionMode;
@@ -51,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.recycler_view);
         tvNoWords = findViewById(R.id.tv_empty_list);
 
         db = new DbHelper(this);
@@ -67,13 +70,13 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             }
         });
 
-        mWordsAdapter = new WordsAdapter(this, wordList);
+        wordsAdapter = new WordsAdapter(this, wordList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new MyDividerItemDecoration(this,
                 LinearLayoutManager.VERTICAL, 16));
-        recyclerView.setAdapter(mWordsAdapter);
+        recyclerView.setAdapter(wordsAdapter);
 
         toggleEmptyWords();
 
@@ -88,14 +91,10 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
             @Override
             public void onLongClick(View view, int position) {
-//                showActionsDialog(position);
                 if(!isMultiSelect){
-                    //TODO check if possible not to create new Array
-                    //selectedIds = new ArrayList<>();
                     isMultiSelect = true;
 
                     if(actionMode == null){
-//                        actionMode = startActionMode(MainActivity.this);
                         actionMode = startSupportActionMode(MainActivity.this);
                     }
                 }
@@ -140,7 +139,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             wordList.add(0, w);
 
             //Refreshing the list
-            mWordsAdapter.notifyItemInserted(0);
+            wordsAdapter.notifyItemInserted(0);
+            recyclerView.scrollToPosition(0);
 
             toggleEmptyWords();
         }
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
      */
     private void updateWord(String word, String translation, String comment, int position){
         Word w = wordList.get(position);
-        //Updating word
+
         w.setWord(word);
         w.setTranslation(translation);
         w.setComment(comment);
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
         //Refreshing the list
         wordList.set(position, w);
-        mWordsAdapter.notifyItemChanged(position);
+        wordsAdapter.notifyItemChanged(position);
 
         toggleEmptyWords();
     }
@@ -171,36 +171,21 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
      * Deleting a word from db
      * and removing item from the list
      */
-    private void deleteWord(int position){
-        //Deleting the note from db
-        db.deleteWord(wordList.get(position));
+    private void deleteWord(){
+        //Deleting words from db
+        db.deleteWord(selectedIds);
 
-        //Removing the word from the list
-        wordList.remove(position);
-        mWordsAdapter.notifyItemRemoved(position);
+        for (int position : selectedPositions){
+            selectedWords.add(wordList.get(position));
+        }
 
+        //Removing words from the list
+        wordList.removeAll(selectedWords);
+        wordsAdapter.notifyDataSetChanged();
+
+        selectedPositions.clear();
+        selectedWords.clear();
         toggleEmptyWords();
-    }
-
-    /*
-     * Shows dialog with Edit&Delete options
-     */
-    private void showActionsDialog(final int position){
-        CharSequence[] items = new CharSequence[]{"Edit", "Delete"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose option");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            if(which == 0){
-                mPosition = position;
-                updateWordIntent(wordList.get(position));
-            } else {
-                deleteWord(position);
-            }
-            }
-        });
-        builder.show();
     }
 
     private void updateWordIntent(final Word w){
@@ -224,14 +209,17 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     }
 
     private void multiSelect(int position){
-        Word w = wordList.get(position);
-        long id = w.getId();
+
+        long id = wordList.get(position).getId();
+
         if(actionMode != null){
 
-            if(selectedIds.contains(id)){
-                selectedIds.remove(id);
+            if(selectedIds.contains(String.valueOf(id))){
+                selectedIds.remove(String.valueOf(id));
+                selectedPositions.remove(Integer.valueOf(position));
             } else {
-                selectedIds.add(id);
+                selectedIds.add(String.valueOf(id));
+                selectedPositions.add(position);
             }
 
             if(selectedIds.size() > 1){
@@ -248,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 actionMode.finish();
             }
 
-            mWordsAdapter.setSelectedIds(selectedIds, position);
+            wordsAdapter.setSelectedIds(selectedIds, position);
         }
     }
 
@@ -266,13 +254,15 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
         switch (item.getItemId()){
             case R.id.edit_action:
-                //todo
+                mPosition = selectedPositions.get(0);
+                updateWordIntent(wordList.get(mPosition));
+                actionMode.finish();
                 return true;
             case R.id.delete_action:
-                //todo
+                deleteWord();
+                actionMode.finish();
                 return true;
         }
         return false;
@@ -282,8 +272,10 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     public void onDestroyActionMode(ActionMode mode) {
         actionMode = null;
         isMultiSelect = false;
-        selectedIds = new ArrayList<>();
-        mWordsAdapter.setSelectedIds(selectedIds);
+        selectedIds.clear();
+        wordsAdapter.setSelectedIds(selectedIds);
+        selectedPositions.clear();
+        selectedWords.clear();
     }
 
 }

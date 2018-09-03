@@ -21,7 +21,7 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
 
     private Context context;
     private List<Word> wordList;
-    private List<Long> selectedIds = new ArrayList<>();
+    private List<String> selectedIds = new ArrayList<>();
 
     public WordsAdapter(Context context, List<Word> wordList){
         this.context = context;
@@ -44,6 +44,7 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
         holder.word.setText(word.getRaw());
 
         if(word.getComment().length() > 0){
+            holder.comment.setVisibility(View.VISIBLE);
             holder.comment.setText(word.getComment());
         } else {
             holder.comment.setVisibility(View.GONE);
@@ -51,10 +52,10 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
 
         long id = word.getId();
 
-        if(selectedIds.contains(id)){
+        if(selectedIds.contains(String.valueOf(id))){
             //if item is selected then,set foreground color of FrameLayout.
             holder.rootView.setBackground(new ColorDrawable(ContextCompat.getColor(context,
-                    R.color.selection_gray)));
+                    R.color.selection_purple)));
         } else {
             //else remove selected item color.
             holder.rootView.setBackground(new ColorDrawable(ContextCompat.getColor(context,
@@ -67,12 +68,12 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
         return wordList.size();
     }
 
-    public void setSelectedIds (List<Long> selectedIds, int position){
+    public void setSelectedIds (List<String> selectedIds, int position){
         this.selectedIds = selectedIds;
         notifyItemChanged(position);
     }
 
-    public void setSelectedIds (List<Long> selectedIds){
+    public void setSelectedIds (List<String> selectedIds){
         this.selectedIds = selectedIds;
         notifyDataSetChanged();
     }

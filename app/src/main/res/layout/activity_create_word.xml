@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/type_a_word"
                 android:imeOptions="actionNext"
-                android:inputType="text|textNoSuggestions"
+                android:inputType="text|textNoSuggestions|textCapSentences"
                 style="@style/EditTextStyle"/>
 
         </android.support.design.widget.TextInputLayout>
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/type_a_translation"
                 android:imeOptions="actionNext"
-                android:inputType="text|textNoSuggestions"
+                android:inputType="text|textNoSuggestions|textCapSentences"
                 style="@style/EditTextStyle"/>
 
         </android.support.design.widget.TextInputLayout>
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/type_a_comment"
                 android:imeOptions="actionDone"
-                android:inputType="text|textNoSuggestions|textMultiLine"
+                android:inputType="text|textNoSuggestions|textMultiLine|textCapSentences"
                 style="@style/EditTextStyle"/>
 
         </android.support.design.widget.TextInputLayout>

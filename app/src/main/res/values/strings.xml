@@ -8,4 +8,7 @@
     <string name="create_word">Create word</string>
     <string name="edit_word">Edit word</string>
     <string name="delete_word">Delete word</string>
+    <string name="collections">Collections</string>
+    <string name="learn">Learn</string>
+    <string name="words">Words</string>
 </resources>

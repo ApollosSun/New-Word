@@ -5,7 +5,9 @@
     <color name="colorAccent">#BA68C8</color>
     <color name="gray">#999</color>
     <color name="light_gray">#c2c2c2</color>
+    <color name="extra_light_gray">#f0f0f0</color>
     <color name="dark_gray">#858585</color>
     <color name="word">#606060</color>
     <color name="selection_purple">#F3E5F5</color>
+    <color name="white">#FFFFFF</color>
 </resources>

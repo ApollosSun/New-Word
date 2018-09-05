@@ -8,6 +8,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -27,13 +29,13 @@ public class MainActivity extends AppCompatActivity{
 
         loadFragment(new WordsFragment());
 
-        BottomNavigationView bnv = findViewById(R.id.navigation_view);
+        final BottomNavigationView bnv = findViewById(R.id.navigation_view);
         bnv.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
                 Fragment fragment;
-                //TODO implement disabling of checked section
+
                 switch (item.getItemId()){
                     case R.id.navigation_words:
                         fragment = new WordsFragment();
@@ -55,6 +57,18 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+    }
+
+    private void disableCheckedNavigationItem(BottomNavigationView bnv){
+        Menu menu = bnv.getMenu();
+        for(int i = 0; i < menu.size(); i++){
+            if(menu.getItem(i).isChecked()){
+                menu.getItem(i).setEnabled(false);
+                Log.i("LOG_MAIN", "Checked item is - " + i);
+            } else {
+                menu.getItem(i).setEnabled(true);
+            }
+        }
     }
 
     private void loadFragment(Fragment fragment){

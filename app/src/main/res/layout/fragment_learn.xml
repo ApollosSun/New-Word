@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/word_field"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:orientation="vertical">
 
     <TextView
+        android:id="@+id/tv_word"
+        style="@style/LearnWordStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/learn"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"/>
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="160dp"
+        android:text="Example"
+        android:textColor="@color/word"
+        android:textSize="30sp" />
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/tv_comment"
+        style="@style/LearnWordStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="This is an example"
+        android:textColor="@color/gray" />
+
+    <TextView
+        android:id="@+id/tv_translation"
+        style="@style/LearnWordStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Пример"
+        android:textColor="@color/word"
+        android:textSize="30sp" />
+
+</LinearLayout>

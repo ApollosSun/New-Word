@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.apollossun.newword.CreateWordActivity;
+import com.example.apollossun.newword.MainActivity;
 import com.example.apollossun.newword.R;
 import com.example.apollossun.newword.data.DbHelper;
 import com.example.apollossun.newword.data.model.Word;
@@ -77,7 +78,7 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new MyDividerItemDecoration(getActivity(),
-                LinearLayoutManager.VERTICAL, 16));
+                LinearLayoutManager.VERTICAL, 8));
         recyclerView.setAdapter(wordsAdapter);
 
         toggleEmptyWords();
@@ -111,23 +112,23 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
      * Receiving word from CreateWordActivity
      * and inserting a new or updating an existing word
      */
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data){
-//
-//        if(resultCode == RESULT_OK){
-//            String word = data.getStringExtra(CreateWordActivity.WORD_KEY);
-//            String translation = data.getStringExtra(CreateWordActivity.TRANSLATION_KEY);
-//            String comment = data.getStringExtra(CreateWordActivity.COMMENT_KEY);
-//
-//            if(requestCode==REQUEST_ACCESS_CREATE) {
-//                createWord(word, translation, comment);
-//            } else if(requestCode==REQUEST_ACCESS_UPDATE){
-//                updateWord(word, translation, comment, mPosition);
-//            }else{
-//                super.onActivityResult(requestCode, resultCode, data);
-//            }
-//        }
-//    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+
+        if(resultCode == MainActivity.RESULT_OK){
+            String word = data.getStringExtra(CreateWordActivity.WORD_KEY);
+            String translation = data.getStringExtra(CreateWordActivity.TRANSLATION_KEY);
+            String comment = data.getStringExtra(CreateWordActivity.COMMENT_KEY);
+
+            if(requestCode==REQUEST_ACCESS_CREATE) {
+                createWord(word, translation, comment);
+            } else if(requestCode==REQUEST_ACCESS_UPDATE){
+                updateWord(word, translation, comment, mPosition);
+            }else{
+                super.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+    }
 
     /*
      * Inserting new word in db

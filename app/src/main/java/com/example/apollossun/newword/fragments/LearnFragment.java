@@ -4,10 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,21 +16,24 @@ import com.example.apollossun.newword.data.DbHelper;
 import com.example.apollossun.newword.data.model.Word;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 public class LearnFragment extends Fragment {
 
-    TextView tvWord;
-    TextView tvTranslation;
-    TextView tvComment;
+    private TextView tvWord;
+    private TextView tvTranslation;
+    private TextView tvComment;
+    private LinearLayout linearLayout;
 
-    LinearLayout linearLayout;
     private List<Word> wordList = new ArrayList<>();
-    private DbHelper db;
+    List<Integer> randomList = new ArrayList<>();
+
+    Word word;
 
     private boolean isWordCompleted;
-
-    private int i = 0;
 
     @Nullable
     @Override
@@ -42,16 +45,16 @@ public class LearnFragment extends Fragment {
         tvWord = rootView.findViewById(R.id.tv_word);
         tvTranslation = rootView.findViewById(R.id.tv_translation);
         tvComment = rootView.findViewById(R.id.tv_comment);
+        linearLayout = rootView.findViewById(R.id.word_field);
 
         isWordCompleted = true;
 
-        db = new DbHelper(getActivity());
-        //TODO handle updating
+        DbHelper db = new DbHelper(getActivity());
         wordList.addAll(db.getWords());
 
-        updateWord();
+        //If list is not empty - updating the page with new random word
+        updatePage();
 
-        linearLayout = rootView.findViewById(R.id.word_field);
         linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,26 +65,69 @@ public class LearnFragment extends Fragment {
         return rootView;
     }
 
-    private void updateWord(){
+    private void updatePage(){
+        if(wordList.size() == 0){
+            linearLayout.setEnabled(false);
+        } else {
+            updateWord();
+        }
+    }
 
-        Word word = wordList.get(i);
+    private void updateWord(){
+        getNextWord();
 
         if(isWordCompleted){
-            tvWord.setText(word.getWord());
-            tvComment.setText(word.getComment());
-            tvTranslation.setText("");
             isWordCompleted = false;
-        } else {
-            tvTranslation.setText(word.getTranslation());
-            isWordCompleted = true;
+            tvWord.setText(word.getWord());
 
-            if(i == wordList.size()-1){
-                i = 0;
+            String comment = word.getComment();
+            if(comment.isEmpty()){
+                tvComment.setVisibility(View.GONE);
             } else {
-                i++;
+                tvComment.setVisibility(View.VISIBLE);
+                tvComment.setText(word.getComment());
+            }
+            tvTranslation.setVisibility(View.INVISIBLE);
+        } else {
+            isWordCompleted = true;
+            String translation = word.getTranslation();
+            if(translation.isEmpty()){
+                updateWord();
+            } else {
+                tvTranslation.setVisibility(View.VISIBLE);
+                tvTranslation.setText(translation);
             }
         }
+    }
 
+    private void getNextWord(){
+        if(randomList.size() == 0 && isWordCompleted){
+            randomList = getRandomList();
+            word = wordList.get(randomList.remove(0));
+        } else if(isWordCompleted){
+            word = wordList.get(randomList.remove(0));
+        }
+    }
+
+    private List<Integer> getRandomList(){
+
+        int size = wordList.size();
+
+        Random random = new Random();
+
+        List<Integer> randomList = new ArrayList<>(size);
+        List<Integer> helperList = new ArrayList<>(size);
+
+        for (int i = 0; i < size; i++) {
+            helperList.add(i);
+        }
+
+        while (helperList.size() > 0){
+            int i = random.nextInt(helperList.size());
+            randomList.add(helperList.remove(i));
+        }
+
+        return randomList;
     }
 
 }

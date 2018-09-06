@@ -3,6 +3,7 @@ package com.example.apollossun.newword.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
@@ -10,35 +11,74 @@ import android.util.Log;
 
 import com.example.apollossun.newword.data.model.Word;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper {
 
     private static final int DB_VERSION = 1;
     private static final String DB_NAME = "dictionary.db";
+    private static String DB_PATH;
     private static final String LOG_TAG = DbHelper.class.getSimpleName();
+
+    private Context mContext;
 
     public DbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+        mContext = context;
+        DB_PATH = context.getApplicationInfo().dataDir + "/databases/";
+        createDb();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String query = "CREATE TABLE " + WordContract.TABLE_NAME + " ("
-                + WordContract._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + WordContract.COLUMN_WORD + " TEXT, "
-                + WordContract.COLUMN_TRANSLATION + " TEXT, "
-                + WordContract.COLUMN_COMMENT + " TEXT);";
-
-        db.execSQL(query);
+//        String query = "CREATE TABLE " + WordContract.TABLE_NAME + " ("
+//                + WordContract._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+//                + WordContract.COLUMN_WORD + " TEXT, "
+//                + WordContract.COLUMN_TRANSLATION + " TEXT, "
+//                + WordContract.COLUMN_COMMENT + " TEXT);";
+//
+//        db.execSQL(query);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + WordContract.TABLE_NAME);
-        onCreate(db);
+//        db.execSQL("DROP TABLE IF EXISTS " + WordContract.TABLE_NAME);
+//        onCreate(db);
+    }
+
+    public void createDb(){
+        InputStream inputStream;
+        OutputStream outputStream;
+        try{
+            String outFileName = DB_PATH + DB_NAME;
+            File file = new File(outFileName);
+            if(!file.exists()){
+
+                this.getReadableDatabase();
+                this.close();
+
+                inputStream = mContext.getAssets().open(DB_NAME);
+                outputStream = new FileOutputStream(outFileName);
+                int length;
+                byte[] buffer = new byte[1024];
+
+                while((length = inputStream.read(buffer)) > 0){
+                    outputStream.write(buffer, 0, length);
+                }
+
+                outputStream.flush();
+                outputStream.close();
+                inputStream.close();
+            }
+        } catch(IOException ex){
+            Log.d("DatabaseHelper", ex.getMessage());
+        }
     }
 
     public long insertWord(String word, String translation, String comment){
@@ -88,6 +128,7 @@ public class DbHelper extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
 
         return new Word();
     }
@@ -95,8 +136,8 @@ public class DbHelper extends SQLiteOpenHelper {
     public List<Word> getWords(){
 
         List<Word> words = new ArrayList<>();
-
         SQLiteDatabase db = this.getReadableDatabase();
+
         Cursor cursor = db.rawQuery("SELECT * FROM " + WordContract.TABLE_NAME
                         + " ORDER BY " + WordContract._ID + " DESC",
                 null);
@@ -116,6 +157,7 @@ public class DbHelper extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
 
         return words;
     }
@@ -128,6 +170,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
         int count = cursor.getCount();
         cursor.close();
+        db.close();
 
         return count;
     }

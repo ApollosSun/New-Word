@@ -7,4 +7,5 @@ public class WordContract implements BaseColumns {
     public static final String COLUMN_WORD = "word";
     public static final String COLUMN_TRANSLATION = "translation";
     public static final String COLUMN_COMMENT = "comment";
+    public static final String COLUMN_ISKNOWN = "isknown";
 }

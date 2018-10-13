@@ -6,16 +6,18 @@ public class Word {
     private String word;
     private String translation;
     private String comment;
+    private int isknown;
 
     public Word(){
 
     }
 
-    public Word(int id, String word, String translation, String comment){
+    public Word(int id, String word, String translation, String comment, int isknown){
         this.id = id;
         this.word = word;
         this.translation = translation;
         this.comment = comment;
+        this.isknown = isknown;
     }
 
     public String getRaw (){
@@ -38,6 +40,10 @@ public class Word {
         this.comment = comment;
     }
 
+    public void setIsknown(int isknown) {
+        this.isknown = isknown;
+    }
+
     public long getId() {
         return id;
     }
@@ -54,4 +60,7 @@ public class Word {
         return comment;
     }
 
+    public int getIsknown() {
+        return isknown;
+    }
 }

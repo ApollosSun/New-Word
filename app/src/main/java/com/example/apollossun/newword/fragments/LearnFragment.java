@@ -4,32 +4,33 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.CompoundButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.example.apollossun.newword.R;
 import com.example.apollossun.newword.data.DbHelper;
 import com.example.apollossun.newword.data.model.Word;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 public class LearnFragment extends Fragment {
 
     private TextView tvWord;
     private TextView tvTranslation;
     private TextView tvComment;
-    private LinearLayout linearLayout;
+    private RelativeLayout relativeLayout;
+    private ToggleButton toggleButton;
 
     private List<Word> wordList = new ArrayList<>();
     List<Integer> randomList = new ArrayList<>();
+    private DbHelper db;
 
     Word word;
 
@@ -45,20 +46,38 @@ public class LearnFragment extends Fragment {
         tvWord = rootView.findViewById(R.id.tv_word);
         tvTranslation = rootView.findViewById(R.id.tv_translation);
         tvComment = rootView.findViewById(R.id.tv_comment);
-        linearLayout = rootView.findViewById(R.id.word_field);
+        relativeLayout = rootView.findViewById(R.id.word_field);
+        toggleButton = rootView.findViewById(R.id.btn_known);
 
         isWordCompleted = true;
 
-        DbHelper db = new DbHelper(getActivity());
+        db = new DbHelper(getActivity());
         wordList.addAll(db.getWords());
 
         //If list is not empty - updating the page with new random word
         updatePage();
 
-        linearLayout.setOnClickListener(new View.OnClickListener() {
+        relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 updateWord();
+            }
+        });
+
+        toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    toggleButton.setBackgroundDrawable(getActivity().getResources()
+                            .getDrawable(R.drawable.button_shape_on));
+                    word.setIsknown(1);
+                    db.updateWord(word);
+                } else {
+                    toggleButton.setBackgroundDrawable(getActivity().getResources()
+                            .getDrawable(R.drawable.button_shape_off));
+                    word.setIsknown(0);
+                    db.updateWord(word);
+                }
             }
         });
 
@@ -67,7 +86,7 @@ public class LearnFragment extends Fragment {
 
     private void updatePage(){
         if(wordList.size() == 0){
-            linearLayout.setEnabled(false);
+            relativeLayout.setEnabled(false);
         } else {
             updateWord();
         }
@@ -78,6 +97,8 @@ public class LearnFragment extends Fragment {
 
         if(isWordCompleted){
             isWordCompleted = false;
+
+            setToggleButtonState();
             tvWord.setText(word.getWord());
 
             String comment = word.getComment();
@@ -97,6 +118,18 @@ public class LearnFragment extends Fragment {
                 tvTranslation.setVisibility(View.VISIBLE);
                 tvTranslation.setText(translation);
             }
+        }
+    }
+
+    private void setToggleButtonState() {
+        if(word.getIsknown() == 1){
+            toggleButton.setChecked(true);
+            toggleButton.setBackgroundDrawable(getResources()
+                    .getDrawable(R.drawable.button_shape_on));
+        } else {
+            toggleButton.setChecked(false);
+            toggleButton.setBackgroundDrawable(getResources()
+                    .getDrawable(R.drawable.button_shape_off));
         }
     }
 

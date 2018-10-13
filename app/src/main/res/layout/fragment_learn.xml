@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/word_field"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/tv_word"
         style="@style/LearnWordStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
         android:layout_marginTop="160dp"
-        android:text="Example"
+        android:text="@string/example"
+        android:textAlignment="center"
         android:textColor="@color/word"
         android:textSize="30sp" />
 
@@ -21,8 +20,9 @@
         style="@style/LearnWordStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="This is an example"
+        android:layout_below="@id/tv_word"
+        android:text="@string/this_is_an_example"
+        android:textAlignment="center"
         android:textColor="@color/gray" />
 
     <TextView
@@ -30,10 +30,26 @@
         style="@style/LearnWordStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Пример"
-        android:padding="16dp"
+        android:layout_below="@id/tv_comment"
         android:background="@drawable/word_shape"
+        android:paddingBottom="10dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="10dp"
+        android:text="@string/example_ru"
+        android:textAlignment="center"
         android:textColor="@color/word"
         android:textSize="30sp" />
 
-</LinearLayout>
+    <ToggleButton
+        android:id="@+id/btn_known"
+        style="@style/LearnWordStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/button_shape_off"
+        android:padding="15dp"
+        android:textOff="@string/unknown"
+        android:textOn="@string/known" />
+
+</RelativeLayout>

@@ -21,7 +21,7 @@ import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     private static final String DB_NAME = "dictionary.db";
     private static String DB_PATH;
     private static final String LOG_TAG = DbHelper.class.getSimpleName();
@@ -48,8 +48,9 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-//        db.execSQL("DROP TABLE IF EXISTS " + WordContract.TABLE_NAME);
-//        onCreate(db);
+        if (newVersion > oldVersion) {
+            db.execSQL("ALTER TABLE dictionary ADD COLUMN isknown INTEGER DEFAULT 0");
+        }
     }
 
     public void createDb(){
@@ -81,7 +82,7 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
 
-    public long insertWord(String word, String translation, String comment){
+    public long insertWord(String word, String translation, String comment, int isknown){
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -89,6 +90,7 @@ public class DbHelper extends SQLiteOpenHelper {
         cv.put(WordContract.COLUMN_WORD, word);
         cv.put(WordContract.COLUMN_TRANSLATION, translation);
         cv.put(WordContract.COLUMN_COMMENT, comment);
+        cv.put(WordContract.COLUMN_ISKNOWN, isknown);
 
         long id = db.insert(WordContract.TABLE_NAME, null, cv);
 
@@ -118,7 +120,8 @@ public class DbHelper extends SQLiteOpenHelper {
                     cursor.getInt(cursor.getColumnIndex(WordContract._ID)),
                     cursor.getString(cursor.getColumnIndex(WordContract.COLUMN_WORD)),
                     cursor.getString(cursor.getColumnIndex(WordContract.COLUMN_TRANSLATION)),
-                    cursor.getString(cursor.getColumnIndex(WordContract.COLUMN_COMMENT))
+                    cursor.getString(cursor.getColumnIndex(WordContract.COLUMN_COMMENT)),
+                    cursor.getInt(cursor.getColumnIndex(WordContract.COLUMN_ISKNOWN))
             );
 
             return word;
@@ -149,7 +152,8 @@ public class DbHelper extends SQLiteOpenHelper {
                         cursor.getInt(cursor.getColumnIndex(WordContract._ID)),
                         cursor.getString(cursor.getColumnIndex(WordContract.COLUMN_WORD)),
                         cursor.getString(cursor.getColumnIndex(WordContract.COLUMN_TRANSLATION)),
-                        cursor.getString(cursor.getColumnIndex(WordContract.COLUMN_COMMENT))
+                        cursor.getString(cursor.getColumnIndex(WordContract.COLUMN_COMMENT)),
+                        cursor.getInt(cursor.getColumnIndex(WordContract.COLUMN_ISKNOWN))
                 );
 
                 words.add(word);
@@ -182,6 +186,7 @@ public class DbHelper extends SQLiteOpenHelper {
         cv.put(WordContract.COLUMN_WORD, word.getWord());
         cv.put(WordContract.COLUMN_TRANSLATION, word.getTranslation());
         cv.put(WordContract.COLUMN_COMMENT, word.getComment());
+        cv.put(WordContract.COLUMN_ISKNOWN, word.getIsknown());
 
         //Updating row
         db.update(WordContract.TABLE_NAME, cv,WordContract._ID + "=?",

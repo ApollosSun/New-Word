@@ -22,6 +22,7 @@ import com.example.apollossun.newword.CreateWordActivity;
 import com.example.apollossun.newword.MainActivity;
 import com.example.apollossun.newword.R;
 import com.example.apollossun.newword.data.DbHelper;
+import com.example.apollossun.newword.data.WordContract;
 import com.example.apollossun.newword.data.model.Word;
 import com.example.apollossun.newword.utils.MyDividerItemDecoration;
 import com.example.apollossun.newword.utils.RecyclerTouchListener;
@@ -116,14 +117,15 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
     public void onActivityResult(int requestCode, int resultCode, Intent data){
 
         if(resultCode == MainActivity.RESULT_OK){
-            String word = data.getStringExtra(CreateWordActivity.WORD_KEY);
-            String translation = data.getStringExtra(CreateWordActivity.TRANSLATION_KEY);
-            String comment = data.getStringExtra(CreateWordActivity.COMMENT_KEY);
+            String word = data.getStringExtra(WordContract.COLUMN_WORD);
+            String translation = data.getStringExtra(WordContract.COLUMN_TRANSLATION);
+            String comment = data.getStringExtra(WordContract.COLUMN_COMMENT);
+            int isknown = data.getIntExtra(WordContract.COLUMN_ISKNOWN, 0);
 
             if(requestCode==REQUEST_ACCESS_CREATE) {
-                createWord(word, translation, comment);
+                createWord(word, translation, comment, isknown);
             } else if(requestCode==REQUEST_ACCESS_UPDATE){
-                updateWord(word, translation, comment, mPosition);
+                updateWord(word, translation, comment, isknown, mPosition);
             }else{
                 super.onActivityResult(requestCode, resultCode, data);
             }
@@ -134,8 +136,8 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
      * Inserting new word in db
      * and refreshing the list
      */
-    private void createWord(String word, String translation, String comment){
-        long id = db.insertWord(word, translation, comment);
+    private void createWord(String word, String translation, String comment, int isknown){
+        long id = db.insertWord(word, translation, comment, isknown);
 
         Word w = db.getSingleWord(id);
 
@@ -155,12 +157,13 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
      * Updating word in db and updating
      * item in the list by its position
      */
-    private void updateWord(String word, String translation, String comment, int position){
+    private void updateWord(String word, String translation, String comment, int isknown, int position){
         Word w = wordList.get(position);
 
         w.setWord(word);
         w.setTranslation(translation);
         w.setComment(comment);
+        w.setIsknown(isknown);
 
         //Updating word in db
         db.updateWord(w);
@@ -195,9 +198,10 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
 
     private void updateWordIntent(final Word w){
         Intent intent = new Intent(getActivity(), CreateWordActivity.class);
-        intent.putExtra(CreateWordActivity.WORD_KEY, w.getWord());
-        intent.putExtra(CreateWordActivity.TRANSLATION_KEY, w.getTranslation());
-        intent.putExtra(CreateWordActivity.COMMENT_KEY, w.getComment());
+        intent.putExtra(WordContract.COLUMN_WORD, w.getWord());
+        intent.putExtra(WordContract.COLUMN_TRANSLATION, w.getTranslation());
+        intent.putExtra(WordContract.COLUMN_COMMENT, w.getComment());
+        intent.putExtra(WordContract.COLUMN_ISKNOWN, w.getIsknown());
         startActivityForResult(intent, REQUEST_ACCESS_UPDATE);
     }
 

@@ -11,4 +11,9 @@
     <string name="collections">Collections</string>
     <string name="learn">Learn</string>
     <string name="words">Words</string>
+    <string name="example">Example</string>
+    <string name="this_is_an_example">This is an example</string>
+    <string name="example_ru">Пример</string>
+    <string name="unknown">Unknown</string>
+    <string name="known">Known</string>
 </resources>

@@ -9,19 +9,21 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.ToggleButton;
+
+import com.example.apollossun.newword.data.WordContract;
 
 public class CreateWordActivity extends AppCompatActivity{
 
-    public static final String WORD_KEY = "word";
-    public static final String TRANSLATION_KEY = "translation";
-    public static final String COMMENT_KEY = "comment";
     private static final String LOG_TAG = CreateWordActivity.class.getSimpleName();
 
     private EditText mWord;
     private EditText mTranslation;
     private EditText mComment;
+    private ToggleButton mToggleButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,11 +41,38 @@ public class CreateWordActivity extends AppCompatActivity{
         mWord = findViewById(R.id.et_word);
         mTranslation = findViewById(R.id.et_translation);
         mComment = findViewById(R.id.et_comment);
+        mToggleButton = findViewById(R.id.btn_known);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             setEditText(extras);
             getSupportActionBar().setTitle("Edit the word");
+        } else {
+            mToggleButton.setChecked(false);
+        }
+
+        setToggleButtonState();
+        mToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    mToggleButton.setBackgroundDrawable(getResources()
+                            .getDrawable(R.drawable.button_shape_on));
+                } else {
+                    mToggleButton.setBackgroundDrawable(getResources()
+                            .getDrawable(R.drawable.button_shape_off));
+                }
+            }
+        });
+    }
+
+    private void setToggleButtonState() {
+        if(mToggleButton.isChecked()){
+            mToggleButton.setBackgroundDrawable(getResources()
+                    .getDrawable(R.drawable.button_shape_on));
+        } else {
+            mToggleButton.setBackgroundDrawable(getResources()
+                    .getDrawable(R.drawable.button_shape_off));
         }
     }
 
@@ -72,25 +101,28 @@ public class CreateWordActivity extends AppCompatActivity{
             String word = mWord.getText().toString().trim();
             String translation = mTranslation.getText().toString().trim();
             String comment = mComment.getText().toString().trim();
-            submitWord(word, translation, comment);
+            int isknown = mToggleButton.isChecked() ? 1 : 0;
+            submitWord(word, translation, comment, isknown);
         }
     }
 
-    private void submitWord(String word, String translation, String comment){
+    private void submitWord(String word, String translation, String comment, int  isknown){
 
         Intent intent = new Intent();
-        intent.putExtra(WORD_KEY, word);
-        intent.putExtra(TRANSLATION_KEY, translation);
-        intent.putExtra(COMMENT_KEY, comment);
+        intent.putExtra(WordContract.COLUMN_WORD, word);
+        intent.putExtra(WordContract.COLUMN_TRANSLATION, translation);
+        intent.putExtra(WordContract.COLUMN_COMMENT, comment);
+        intent.putExtra(WordContract.COLUMN_ISKNOWN, isknown);
 
         setResult(RESULT_OK, intent);
         finish();
     }
 
     private void setEditText(Bundle extras){
-        mWord.setText(extras.getString(WORD_KEY));
-        mTranslation.setText(extras.getString(TRANSLATION_KEY));
-        mComment.setText(extras.getString(COMMENT_KEY));
+        mWord.setText(extras.getString(WordContract.COLUMN_WORD));
+        mTranslation.setText(extras.getString(WordContract.COLUMN_TRANSLATION));
+        mComment.setText(extras.getString(WordContract.COLUMN_COMMENT));
+        mToggleButton.setChecked(extras.getInt(WordContract.COLUMN_ISKNOWN) == 1);
     }
 
 }

@@ -109,6 +109,12 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
         return rootView;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     /*
      * Receiving word from CreateWordActivity
      * and inserting a new or updating an existing word
@@ -312,6 +318,12 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
             actionMode.finish();
         }
         super.onStop();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_search, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
 }

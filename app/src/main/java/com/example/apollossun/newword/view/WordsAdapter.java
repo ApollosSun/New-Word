@@ -101,4 +101,11 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
         }
     }
 
+//    //TODO
+//    private void search(List<Word> searchedWords){
+//        wordList = new ArrayList<>();
+//        wordList.addAll(searchedWords);
+//        notifyDataSetChanged();
+//    }
+
 }

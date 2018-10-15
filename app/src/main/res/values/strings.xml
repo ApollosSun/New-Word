@@ -19,6 +19,7 @@
     <string name="statistic">Statistic</string>
     <string name="settings">Settings</string>
     <string name="words_to_study_default">Unlearned words</string>
+    <string name="search">Search</string>
 
     <array name="words_to_study_entries">
         <item>All words</item>

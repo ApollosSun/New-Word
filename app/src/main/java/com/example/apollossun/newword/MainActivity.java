@@ -1,6 +1,8 @@
 package com.example.apollossun.newword;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -28,6 +30,8 @@ public class MainActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
 
         loadFragment(new WordsFragment());
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         final BottomNavigationView bnv = findViewById(R.id.navigation_view);
         bnv.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -76,6 +80,27 @@ public class MainActivity extends AppCompatActivity{
         transaction.replace(R.id.fragment_container, fragment);
         //transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.statistics:
+                Intent intentStat = new Intent(this, StatisticsActivity.class);
+                startActivity(intentStat);
+                return true;
+            case R.id.settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

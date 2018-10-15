@@ -171,8 +171,19 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
         //Refreshing the list
         wordList.set(position, w);
         wordsAdapter.notifyItemChanged(position);
+    }
 
-        toggleEmptyWords();
+    private void updateWordState(int wordState){
+        for (int position : selectedPositions){
+
+            Word w = wordList.get(position);
+            w.setIsknown(wordState);
+
+            db.updateWord(w);
+
+            wordList.set(position, w);
+            wordsAdapter.notifyItemChanged(position);
+        }
     }
 
     /*
@@ -206,7 +217,7 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
     }
 
     /**
-     * Toggling list and empty notes view
+     * Toggling list and empty words view
      */
     private void toggleEmptyWords() {
         // you can check notesList.size() > 0
@@ -271,6 +282,14 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
                 return true;
             case R.id.delete_action:
                 deleteWord();
+                actionMode.finish();
+                return true;
+            case R.id.mark_learned:
+                updateWordState(1);
+                actionMode.finish();
+                return true;
+            case R.id.mark_not_learned:
+                updateWordState(0);
                 actionMode.finish();
                 return true;
         }

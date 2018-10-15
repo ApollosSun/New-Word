@@ -166,10 +166,55 @@ public class DbHelper extends SQLiteOpenHelper {
         return words;
     }
 
+    public List<Word> getUnknownWords(){
+
+        List<Word> words = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + WordContract.TABLE_NAME
+                        + " WHERE " + WordContract.COLUMN_ISKNOWN + " = 0"
+                        + " ORDER BY " + WordContract._ID + " DESC",
+                null);
+
+        if(cursor.moveToFirst()){
+            do {
+
+                Word word = new Word(
+                        cursor.getInt(cursor.getColumnIndex(WordContract._ID)),
+                        cursor.getString(cursor.getColumnIndex(WordContract.COLUMN_WORD)),
+                        cursor.getString(cursor.getColumnIndex(WordContract.COLUMN_TRANSLATION)),
+                        cursor.getString(cursor.getColumnIndex(WordContract.COLUMN_COMMENT)),
+                        cursor.getInt(cursor.getColumnIndex(WordContract.COLUMN_ISKNOWN))
+                );
+
+                words.add(word);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return words;
+    }
+
     public int getWordCount(){
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + WordContract.TABLE_NAME,
+                null);
+
+        int count = cursor.getCount();
+        cursor.close();
+        db.close();
+
+        return count;
+    }
+
+    public int getUnknownWordCount(){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + WordContract.TABLE_NAME
+                        + " WHERE " + WordContract.COLUMN_ISKNOWN + " = 0",
                 null);
 
         int count = cursor.getCount();

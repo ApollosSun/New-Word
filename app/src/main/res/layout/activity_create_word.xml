@@ -82,8 +82,8 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/button_shape_off"
             android:padding="15dp"
-            android:textOff="@string/unknown"
-            android:textOn="@string/known" />
+            android:textOff="Learned"
+            android:textOn="Learned ✓" />
 
     </LinearLayout>
 

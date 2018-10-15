@@ -13,7 +13,7 @@
         android:text="@string/example"
         android:textAlignment="center"
         android:textColor="@color/word"
-        android:textSize="30sp" />
+        android:textSize="25sp" />
 
     <TextView
         android:id="@+id/tv_comment"
@@ -23,7 +23,8 @@
         android:layout_below="@id/tv_word"
         android:text="@string/this_is_an_example"
         android:textAlignment="center"
-        android:textColor="@color/gray" />
+        android:textColor="@color/gray"
+        android:textSize="20sp"/>
 
     <TextView
         android:id="@+id/tv_translation"
@@ -39,7 +40,7 @@
         android:text="@string/example_ru"
         android:textAlignment="center"
         android:textColor="@color/word"
-        android:textSize="30sp" />
+        android:textSize="25sp" />
 
     <ToggleButton
         android:id="@+id/btn_known"
@@ -49,7 +50,7 @@
         android:layout_alignParentBottom="true"
         android:background="@drawable/button_shape_off"
         android:padding="15dp"
-        android:textOff="@string/unknown"
-        android:textOn="@string/known" />
+        android:textOff="Learned"
+        android:textOn="Learned ✓"/>
 
 </RelativeLayout>

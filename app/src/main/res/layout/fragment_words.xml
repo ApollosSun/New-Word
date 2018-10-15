@@ -17,6 +17,7 @@
         android:layout_margin="16dp"
         android:backgroundTint="@color/colorAccent"
         app:srcCompat="@drawable/ic_add_black_24dp"
+        app:layout_behavior="com.example.apollossun.newword.utils.ScrollAwareFABBehavior"
         tools:ignore="VectorDrawableCompat" />
 
 </android.support.design.widget.CoordinatorLayout>

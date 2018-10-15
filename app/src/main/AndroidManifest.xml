@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_dictionary_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -16,13 +17,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateWordActivity"
+
+        <activity
+            android:name=".CreateWordActivity"
             android:label="Create a word"
-            android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="stateVisible">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+            android:windowSoftInputMode="stateVisible"/>
+
+        <activity
+            android:name=".StatisticsActivity"
+            android:label="Statistic"/>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="Settings">
+            <!--<meta-data-->
+                <!--android:name="android.support.PARENT_ACTIVITY"-->
+                <!--android:value=".MainActivity"-->
+                <!--/>-->
         </activity>
 
     </application>

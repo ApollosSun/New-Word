@@ -2,14 +2,30 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/edit_action"
+    <item
+        android:id="@+id/edit_action"
+        android:icon="@drawable/ic_edit_white_24dp"
+        android:orderInCategory="0"
         android:title="@string/edit_word"
-        app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_edit_white_24dp"/>
+        android:showAsAction="ifRoom" />
 
-    <item android:id="@+id/delete_action"
+    <item
+        android:id="@+id/delete_action"
+        android:icon="@drawable/ic_delete_white_24dp"
+        android:orderInCategory="1"
         android:title="@string/delete_word"
-        app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_delete_white_24dp"/>
+        android:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/mark_learned"
+        android:orderInCategory="100"
+        android:title="@string/mark_as_learned"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/mark_not_learned"
+        android:orderInCategory="101"
+        android:title="@string/mark_as_unlearned"
+        android:showAsAction="never" />
 
 </menu>

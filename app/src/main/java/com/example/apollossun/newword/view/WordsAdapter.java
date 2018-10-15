@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -42,6 +43,12 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
         Word word = wordList.get(position);
 
         holder.word.setText(word.getRaw());
+
+        if(word.getIsknown() == 1){
+            holder.imageDot.setImageResource(R.drawable.circle_on);
+        } else {
+            holder.imageDot.setImageResource(R.drawable.circle_off);
+        }
 
         if(word.getComment().length() > 0){
             holder.comment.setVisibility(View.VISIBLE);
@@ -82,12 +89,14 @@ public class WordsAdapter extends RecyclerView.Adapter<WordsAdapter.ViewHolder> 
 
         public TextView word;
         public TextView comment;
+        public ImageView imageDot;
         public RelativeLayout rootView;
 
         ViewHolder(View itemView) {
             super(itemView);
             word = itemView.findViewById(R.id.tv_word);
             comment = itemView.findViewById(R.id.tv_comment);
+            imageDot = itemView.findViewById(R.id.iv_dot);
             rootView = itemView.findViewById(R.id.word_row_layout);
         }
     }

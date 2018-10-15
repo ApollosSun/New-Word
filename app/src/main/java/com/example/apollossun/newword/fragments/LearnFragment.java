@@ -1,6 +1,8 @@
 package com.example.apollossun.newword.fragments;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.example.apollossun.newword.R;
+import com.example.apollossun.newword.SettingsActivity;
 import com.example.apollossun.newword.data.DbHelper;
 import com.example.apollossun.newword.data.model.Word;
 
@@ -52,7 +55,11 @@ public class LearnFragment extends Fragment {
         isWordCompleted = true;
 
         db = new DbHelper(getActivity());
-        wordList.addAll(db.getWords());
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String wordsToLearnPrefs = preferences.getString("pref_wordsToStudy", "");
+
+        updateWordList(wordsToLearnPrefs);
 
         //If list is not empty - updating the page with new random word
         updatePage();
@@ -84,9 +91,19 @@ public class LearnFragment extends Fragment {
         return rootView;
     }
 
+    //TODO public
+    private void updateWordList(String wordsToLearnPrefs) {
+        if(wordsToLearnPrefs.equals("Unlearned words")){
+            wordList.addAll(db.getUnknownWords());
+        } else {
+            wordList.addAll(db.getWords());
+        }
+    }
+
     private void updatePage(){
         if(wordList.size() == 0){
             relativeLayout.setEnabled(false);
+            toggleButton.setVisibility(View.INVISIBLE);
         } else {
             updateWord();
         }

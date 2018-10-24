@@ -77,6 +77,7 @@ public class LearnFragment extends Fragment {
                 if (isChecked){
                     toggleButton.setBackgroundDrawable(getActivity().getResources()
                             .getDrawable(R.drawable.button_shape_on));
+                    wordList.remove(word);
                     word.setIsknown(1);
                     db.updateWord(word);
                 } else {
@@ -91,7 +92,6 @@ public class LearnFragment extends Fragment {
         return rootView;
     }
 
-    //TODO public
     private void updateWordList(String wordsToLearnPrefs) {
         if(wordsToLearnPrefs.equals("Unlearned words")){
             wordList.addAll(db.getUnknownWords());

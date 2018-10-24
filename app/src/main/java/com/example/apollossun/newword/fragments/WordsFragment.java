@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,6 +41,7 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
     private RecyclerView recyclerView;
 
     private List<Word> wordList = new ArrayList<>();
+    private List<Word> fullWordList;
     private List<String> selectedIds = new ArrayList<>();
     private List<Integer> selectedPositions = new ArrayList<>();
     private List<Word> selectedWords = new ArrayList<>();
@@ -63,6 +65,7 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
 
         db = new DbHelper(getActivity());
         wordList.addAll(db.getWords());
+        fullWordList = new ArrayList<>(wordList);
 
         FloatingActionButton fab = rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener(){
@@ -323,6 +326,27 @@ public class WordsFragment extends Fragment implements ActionMode.Callback{
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_search, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                String input = newText.toLowerCase();
+                wordList.clear();
+                for (Word searchedWord : fullWordList){
+                    if(searchedWord.getWord().toLowerCase().contains(input)){
+                        wordList.add(searchedWord);
+                    }
+                }
+                wordsAdapter.search(wordList);
+                return false;
+            }
+        });
         super.onCreateOptionsMenu(menu, inflater);
     }
 

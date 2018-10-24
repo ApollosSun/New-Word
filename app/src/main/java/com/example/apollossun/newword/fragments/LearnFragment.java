@@ -6,16 +6,15 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.example.apollossun.newword.R;
-import com.example.apollossun.newword.SettingsActivity;
 import com.example.apollossun.newword.data.DbHelper;
 import com.example.apollossun.newword.data.model.Word;
 
@@ -23,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class LearnFragment extends Fragment {
+public class LearnFragment extends Fragment
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private TextView tvWord;
     private TextView tvTranslation;
@@ -32,10 +32,13 @@ public class LearnFragment extends Fragment {
     private ToggleButton toggleButton;
 
     private List<Word> wordList = new ArrayList<>();
-    List<Integer> randomList = new ArrayList<>();
+    private List<Integer> randomList = new ArrayList<>();
     private DbHelper db;
+    private SharedPreferences preferences;
 
-    Word word;
+    private String wordsToLearnPrefs;
+
+    private Word word;
 
     private boolean isWordCompleted;
 
@@ -52,14 +55,11 @@ public class LearnFragment extends Fragment {
         relativeLayout = rootView.findViewById(R.id.word_field);
         toggleButton = rootView.findViewById(R.id.btn_known);
 
+        db = new DbHelper(getActivity());
         isWordCompleted = true;
 
-        db = new DbHelper(getActivity());
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String wordsToLearnPrefs = preferences.getString("pref_wordsToStudy", "");
-
-        updateWordList(wordsToLearnPrefs);
+        getPreferences();
+        updateWordList();
 
         //If list is not empty - updating the page with new random word
         updatePage();
@@ -71,13 +71,12 @@ public class LearnFragment extends Fragment {
             }
         });
 
-        toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        toggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
+            public void onClick(View v) {
+                if(toggleButton.isChecked()){
                     toggleButton.setBackgroundDrawable(getActivity().getResources()
                             .getDrawable(R.drawable.button_shape_on));
-                    wordList.remove(word);
                     word.setIsknown(1);
                     db.updateWord(word);
                 } else {
@@ -92,16 +91,17 @@ public class LearnFragment extends Fragment {
         return rootView;
     }
 
-    private void updateWordList(String wordsToLearnPrefs) {
-        if(wordsToLearnPrefs.equals("Unlearned words")){
-            wordList.addAll(db.getUnknownWords());
-        } else {
-            wordList.addAll(db.getWords());
-        }
+    private void getPreferences(){
+        preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        wordsToLearnPrefs = preferences.getString("pref_wordsToStudy", "");
     }
 
-    private void updatePage(){
-        if(wordList.size() == 0){
+    private void updateWordList() {
+        wordList.addAll(db.getWords());
+    }
+
+    private void updatePage() {
+        if (wordList.size() == 0) {
             relativeLayout.setEnabled(false);
             toggleButton.setVisibility(View.INVISIBLE);
         } else {
@@ -110,31 +110,39 @@ public class LearnFragment extends Fragment {
     }
 
     private void updateWord(){
+
         getNextWord();
 
         if(isWordCompleted){
+
             isWordCompleted = false;
 
             setToggleButtonState();
             tvWord.setText(word.getWord());
 
             String comment = word.getComment();
+
             if(comment.isEmpty()){
                 tvComment.setVisibility(View.GONE);
             } else {
                 tvComment.setVisibility(View.VISIBLE);
-                tvComment.setText(word.getComment());
+                tvComment.setText(comment);
             }
+
             tvTranslation.setVisibility(View.INVISIBLE);
+
         } else {
+
             isWordCompleted = true;
             String translation = word.getTranslation();
+
             if(translation.isEmpty()){
                 updateWord();
             } else {
                 tvTranslation.setVisibility(View.VISIBLE);
                 tvTranslation.setText(translation);
             }
+
         }
     }
 
@@ -154,8 +162,16 @@ public class LearnFragment extends Fragment {
         if(randomList.size() == 0 && isWordCompleted){
             randomList = getRandomList();
             word = wordList.get(randomList.remove(0));
+            checkWord();
         } else if(isWordCompleted){
             word = wordList.get(randomList.remove(0));
+            checkWord();
+        }
+    }
+
+    private void checkWord(){
+        if(wordsToLearnPrefs.equals("Unlearned words") && word.getIsknown() != 0){
+           getNextWord();
         }
     }
 
@@ -178,6 +194,17 @@ public class LearnFragment extends Fragment {
         }
 
         return randomList;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        getPreferences();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        preferences.registerOnSharedPreferenceChangeListener(this);
     }
 
 }
